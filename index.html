@@ -856,7 +856,14 @@ function toggleEmoji() {
 
 /* ================= push ================= */
 const b64 = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };
+function pushBlocker() {
+  if (!window.isSecureContext) return 'Сайт открыт не по https — браузер не даёт включать уведомления. Нужен адрес https://…';
+  try { if (window.top !== window) return 'Сайт открыт внутри другой страницы (встроенный просмотр). Откройте его в отдельной вкладке браузера.'; } catch (_) { return 'Сайт открыт внутри другой страницы (встроенный просмотр). Откройте его в отдельной вкладке браузера.'; }
+  if (/FBAN|FBAV|Instagram|Telegram|; wv\)|Line\/|MiuiBrowser.*Mobile.*Version/i.test(navigator.userAgent)) return 'Вы открыли сайт во встроенном браузере приложения (Telegram, Instagram и т. п.) — там уведомления не работают. Откройте ссылку в Chrome или Safari.';
+  return '';
+}
 function pushStatus() {
+  const b = pushBlocker(); if (b) return b;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return 'Не поддерживается. На iPhone добавьте oilim на экран «Домой».';
   return Notification.permission === 'granted' ? 'Разрешено на этом устройстве' : Notification.permission === 'denied' ? 'Заблокировано в настройках браузера' : 'Ещё не включено';
 }
@@ -868,6 +875,7 @@ const setPushState = () => { const el = $('#pushState'); if (el) el.textContent 
 // ВАЖНО: requestPermission вызывается синхронно из клика (до любых await) — иначе Safari/iOS молча отклоняет.
 async function enablePush() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) { toast(pushStatus()); setPushState(); return false; }
+  const blk = pushBlocker(); if (blk) { toast(blk); setPushState(); return false; }
   let perm = Notification.permission;
   if (perm === 'default') perm = await Notification.requestPermission();
   if (perm !== 'granted') { toast(perm === 'denied' ? 'Браузер блокирует уведомления для этого сайта. Разрешите их в настройках сайта (значок замка у адреса) и обновите страницу' : 'Вы закрыли запрос, не выбрав ответ. Нажмите ещё раз и выберите «Разрешить»'); await saveSettings({ push_enabled: false }); setPushState(); renderPanel(); return false; }
