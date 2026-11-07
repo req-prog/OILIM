@@ -647,7 +647,7 @@ async function removeFriend(id) {
 function renderSettings(p) {
   const st = S.settings, me = S.me;
   const sw = (key, label, sub, after) => h('label', { class: 'line' }, h('div', {}, h('div', { style: 'font-weight:700' }, label), sub ? h('div', { class: 'sub', style: 'font-size:12.5px;color:var(--muted)' }, sub) : null),
-    h('span', { class: 'sw' }, h('input', { type: 'checkbox', checked: !!st[key], onchange: async (e) => { if (after) return after(e.target.checked, e.target); await saveSettings({ [key]: e.target.checked }); } }), h('i')));
+    h('span', { class: 'sw' }, h('input', { type: 'checkbox', checked: key === 'push_enabled' ? (!!st[key] && pushGranted()) : !!st[key], onchange: async (e) => { if (after) return after(e.target.checked, e.target); await saveSettings({ [key]: e.target.checked }); } }), h('i')));
   const dn = h('input', { class: 'in', id: 'sdn', maxlength: 40, value: me.display_name }), bio = h('input', { class: 'in', id: 'sbio', maxlength: 200, value: me.bio, placeholder: 'О себе' });
   const file = $('#avFileSet');
   p.replaceChildren(h('div', { class: 'set' },
@@ -856,6 +856,7 @@ function toggleEmoji() {
 
 /* ================= push ================= */
 const b64 = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };
+function pushGranted() { return 'Notification' in window && Notification.permission === 'granted'; }
 function pushBlocker() {
   if (!window.isSecureContext) return 'Сайт открыт не по https — браузер не даёт включать уведомления. Нужен адрес https://…';
   try { if (window.top !== window) return 'Сайт открыт внутри другой страницы (встроенный просмотр). Откройте его в отдельной вкладке браузера.'; } catch (_) { return 'Сайт открыт внутри другой страницы (встроенный просмотр). Откройте его в отдельной вкладке браузера.'; }
@@ -865,7 +866,7 @@ function pushBlocker() {
 function pushStatus() {
   const b = pushBlocker(); if (b) return b;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return 'Не поддерживается. На iPhone добавьте oilim на экран «Домой».';
-  return Notification.permission === 'granted' ? 'Разрешено на этом устройстве' : Notification.permission === 'denied' ? 'Заблокировано в настройках браузера' : 'Ещё не включено';
+  return Notification.permission === 'granted' ? 'Разрешено на этом устройстве' : Notification.permission === 'denied' ? 'Заблокировано в браузере (в режиме инкогнито уведомления недоступны)' : 'Ещё не включено';
 }
 const swReady = () => Promise.race([
   navigator.serviceWorker.getRegistration().then((r) => r || navigator.serviceWorker.register('sw.js')).then(() => navigator.serviceWorker.ready),
@@ -878,9 +879,9 @@ async function enablePush() {
   const blk = pushBlocker(); if (blk) { toast(blk); setPushState(); return false; }
   let perm = Notification.permission;
   if (perm === 'default') perm = await Notification.requestPermission();
-  if (perm !== 'granted') { toast(perm === 'denied' ? 'Браузер блокирует уведомления для этого сайта. Разрешите их в настройках сайта (значок замка у адреса) и обновите страницу' : 'Вы закрыли запрос, не выбрав ответ. Нажмите ещё раз и выберите «Разрешить»'); await saveSettings({ push_enabled: false }); setPushState(); renderPanel(); return false; }
+  if (perm !== 'granted') { toast(perm === 'denied' ? 'Браузер блокирует уведомления для этого сайта. В режиме инкогнито они недоступны вообще; в обычной вкладке разрешите их в настройках сайта (значок замка у адреса) и обновите страницу' : 'Вы закрыли запрос, не выбрав ответ. Нажмите ещё раз и выберите «Разрешить»'); await saveSettings({ push_enabled: false }); setPushState(); renderPanel(); return false; }
   await saveSettings({ push_enabled: true });
-  const ok = await initPush(true); renderPanel(); return ok;
+  const ok = await initPush(true); if (!ok) await saveSettings({ push_enabled: false }); renderPanel(); return ok;
 }
 async function initPush(ask) {
   try {
@@ -889,8 +890,13 @@ async function initPush(ask) {
     const reg = await swReady();
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(VAPID_PUBLIC) });
-    const j = sub.toJSON();
-    const { error } = await sb.from('oilim_push_subs').upsert({ user_id: uid(), endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' });
+    const saveSub = (x) => { const j = x.toJSON(); return sb.from('oilim_push_subs').upsert({ user_id: uid(), endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' }); };
+    let { error } = await saveSub(sub);
+    if (error && (error.code === '42501' || /row-level security/i.test(error.message || ''))) {
+      await sub.unsubscribe();
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(VAPID_PUBLIC) });
+      ({ error } = await saveSub(sub));
+    }
     if (error) throw error;
     if (ask) toast('Push включены');
     setPushState(); return true;
