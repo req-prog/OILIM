@@ -870,7 +870,7 @@ async function enablePush() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) { toast(pushStatus()); setPushState(); return false; }
   let perm = Notification.permission;
   if (perm === 'default') perm = await Notification.requestPermission();
-  if (perm !== 'granted') { toast('Уведомления заблокированы — разрешите их в настройках браузера'); await saveSettings({ push_enabled: false }); setPushState(); renderPanel(); return false; }
+  if (perm !== 'granted') { toast(perm === 'denied' ? 'Браузер блокирует уведомления для этого сайта. Разрешите их в настройках сайта (значок замка у адреса) и обновите страницу' : 'Вы закрыли запрос, не выбрав ответ. Нажмите ещё раз и выберите «Разрешить»'); await saveSettings({ push_enabled: false }); setPushState(); renderPanel(); return false; }
   await saveSettings({ push_enabled: true });
   const ok = await initPush(true); renderPanel(); return ok;
 }
