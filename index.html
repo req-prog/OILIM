@@ -68,7 +68,6 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-t
 /* ---------- avatars ---------- */
 .av{flex:none;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;overflow:hidden;position:relative;user-select:none}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
-.av .dot{position:absolute;right:0;bottom:0;width:30%;height:30%;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
 
 /* ---------- app ---------- */
 #app{position:fixed;inset:0;display:grid;grid-template-columns:360px 1fr;background:var(--bg)}
@@ -160,7 +159,7 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-t
 /* ---------- misc ---------- */
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:grid;place-items:center;z-index:50;padding:16px}
 #lb img{max-width:100%;max-height:100%;border-radius:8px}
-#toasts{position:fixed;left:50%;transform:translateX(-50%);top:calc(14px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:8px;z-index:60;width:min(92vw,380px)}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);top:calc(14px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:8px;z-index:95;width:min(92vw,380px)}
 .toast{background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;box-shadow:var(--shadow);font-weight:600;font-size:14px;animation:tin .25s;cursor:pointer}
 @keyframes tin{from{transform:translateY(-12px);opacity:0}}
 #boot{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:70}
@@ -189,9 +188,6 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-t
 .m.in{animation:mIn .26s cubic-bezier(.2,.9,.3,1.25) both;transform-origin:0 100%}
 .m.me.in{transform-origin:100% 100%}
 @keyframes mIn{from{opacity:0;transform:translateY(10px) scale(.86)}}
-.day{animation:fade .3s both}
-.avpick .av{transition:transform .25s}.avpick .av:hover{transform:rotate(-6deg) scale(1.05)}
-.av .dot{animation:dotp 2.4s ease-in-out infinite}
 @keyframes dotp{50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}}
 .emo{animation:pop .18s cubic-bezier(.2,.9,.3,1.3);transform-origin:0 100%}
 @keyframes pop{from{opacity:0;transform:scale(.85) translateY(8px)}}
@@ -203,6 +199,74 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-t
 @media (max-width:820px){#app.in-chat .main{animation:slide .26s cubic-bezier(.2,.8,.2,1)}}
 @keyframes slide{from{transform:translateX(40px);opacity:0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- аватарка: кружок «в сети» над аватаркой, не внутри ---------- */
+.avw{position:relative;flex:none;border-radius:50%}
+.avw .av{width:100%;height:100%}
+.avw .dot{position:absolute;right:-1px;bottom:-1px;width:max(11px,28%);height:max(11px,28%);border-radius:50%;background:var(--accent);border:2.5px solid var(--ring,var(--surface));z-index:2;pointer-events:none;animation:dotp 2.4s ease-in-out infinite}
+.row:hover,.row.on{--ring:var(--surface2)}
+.avpick .avw{transition:transform .25s}.avpick .avw:hover{transform:rotate(-6deg) scale(1.05)}
+
+/* ---------- галочки фиксированного размера: пузырь не меняет ширину при прочтении ---------- */
+.m .t{line-height:13px;min-height:13px}
+.tk{display:inline-block;width:18px;height:11px;flex:none;opacity:.7}
+.tk.r{opacity:1;color:#b8f1ff}
+.tk svg{display:block;width:18px;height:11px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- «печатает…» ---------- */
+.typing{color:var(--accent)!important;font-weight:600}
+.dots{display:inline-flex;gap:2px;margin-left:3px;vertical-align:middle}
+.dots i{width:4px;height:4px;border-radius:50%;background:currentColor;animation:dj 1.2s infinite both}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes dj{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-3px);opacity:1}}
+
+/* ---------- видео в чате ---------- */
+.vid{min-width:230px;white-space:normal}
+.vid video{display:block;width:300px;max-width:100%;max-height:360px;border-radius:12px;background:#000}
+.vcard{display:flex;align-items:center;gap:12px;width:100%;min-width:230px;text-align:left;padding:2px 0;color:inherit;white-space:normal}
+.vplay{width:46px;height:46px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex:none}
+.m.me .vplay{background:#fff;color:var(--accent2)}
+.vplay svg{width:20px;height:20px;fill:currentColor}
+.vm{min-width:0;flex:1}.vm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vm .fs{font-size:12px;opacity:.75}
+@media (max-width:820px){.vid video{width:240px}}
+
+/* ---------- выбор положения аватарки ---------- */
+#crop{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:16px}
+.crop-card{width:min(360px,100%);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow);text-align:center}
+.crop-title{font-weight:800;font-size:17px;margin-bottom:12px}
+#cropStage{position:relative;width:min(300px,100%);aspect-ratio:1;margin:0 auto;overflow:hidden;border-radius:16px;background:#000;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#cropStage:active{cursor:grabbing}
+.crop-img{position:absolute;left:50%;top:50%;max-width:none!important;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.crop-mask{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 400px rgba(0,0,0,.58);border:2px solid rgba(255,255,255,.85);pointer-events:none}
+#cropZoom{width:100%;margin:16px 0 4px;accent-color:var(--accent)}
+.crop-hint{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.crop-btns{display:flex;gap:10px}.crop-btns .btn{flex:1}
+
+/* ---------- звонки ---------- */
+#toasts{z-index:95}
+#call{position:fixed;inset:0;z-index:80;background:#06100b;color:#fff;display:flex;flex-direction:column;overflow:hidden}
+#call video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#rv{z-index:1}#rv.novid{opacity:0}
+.c-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(700px 520px at 50% 28%,rgba(47,211,122,.26),transparent 70%),#06100b}
+.c-top{position:relative;z-index:3;text-align:center;padding:calc(22px + env(safe-area-inset-top,0px)) 20px 0;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.c-name{font-family:var(--f-display);font-weight:700;font-size:22px}
+.c-st{margin-top:4px;opacity:.85;font-variant-numeric:tabular-nums}
+.c-mid{position:relative;z-index:2;flex:1;display:grid;place-items:center}
+.c-mid .avw{box-shadow:0 0 0 0 rgba(47,211,122,.45)}
+.c-mid.ringing .avw{animation:cring 1.8s ease-out infinite}
+@keyframes cring{to{box-shadow:0 0 0 38px rgba(47,211,122,0)}}
+.c-pip{position:absolute;z-index:4;right:14px;top:calc(78px + env(safe-area-inset-top,0px));width:108px;height:152px;border-radius:16px;overflow:hidden;background:#111;border:1.5px solid rgba(255,255,255,.28);box-shadow:0 6px 24px rgba(0,0,0,.5)}
+#lv.mir{transform:scaleX(-1)}
+.c-off{position:absolute;inset:0;display:grid;place-items:center;background:#16251c;color:#fff}
+.c-off svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.c-ctl{position:relative;z-index:4;margin-top:auto;display:flex;justify-content:center;gap:18px;padding:16px 16px calc(30px + env(safe-area-inset-bottom,0px))}
+.cb{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;transition:background .18s,transform .12s}
+.cb:hover{background:rgba(255,255,255,.28)}.cb:active{transform:scale(.93)}
+.cb svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cb.off{background:#fff;color:#111}
+.cb.red{background:#e5484d}.cb.red:hover{background:#cf3a3f}.cb.red svg{transform:rotate(135deg)}
+.cb.green{background:#1fb55f}.cb.green:hover{background:#18a054}
 </style>
 </head>
 <body>
@@ -258,6 +322,27 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-t
 
 <input type="file" id="avFileSet" class="vh" accept="image/*,.heic,.heif" tabindex="-1">
 <div id="lb" hidden><img alt=""></div>
+
+<!-- выбор положения аватарки -->
+<div id="crop" hidden>
+  <div class="crop-card">
+    <div class="crop-title">Положение аватарки</div>
+    <div id="cropStage"><div class="crop-mask"></div></div>
+    <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" aria-label="Масштаб">
+    <div class="crop-hint">Перетащите фото и приблизьте его, чтобы выбрать, что попадёт в круг</div>
+    <div class="crop-btns"><button type="button" class="btn ghost" id="cropNo">Отмена</button><button type="button" class="btn" id="cropOk">Готово</button></div>
+  </div>
+</div>
+
+<!-- звонок -->
+<div id="call" hidden>
+  <div class="c-bg"></div>
+  <video id="rv" autoplay playsinline></video>
+  <div class="c-top"><div class="c-name" id="cName"></div><div class="c-st" id="cSt"></div></div>
+  <div class="c-mid" id="cMid"></div>
+  <div class="c-pip" id="cPip" hidden><video id="lv" autoplay playsinline muted></video><div class="c-off" id="cPipOff" hidden></div></div>
+  <div class="c-ctl" id="cCtl"></div>
+</div>
 <div id="toasts" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -313,11 +398,13 @@ function toast(t, onclick) { const e = h('div', { class: 'toast', onclick: () =>
 const hue = (s) => { let x = 0; for (const c of s) x = (x * 31 + c.charCodeAt(0)) % 360; return x; };
 function avatar(p, size = 44, online = false) {
   const nm = (p && (p.display_name || p.nick)) || '?';
-  const el = h('div', { class: 'av', style: `width:${size}px;height:${size}px;font-size:${size * .42}px;background:linear-gradient(135deg,hsl(${100 + hue(nm) % 80} 60% 45%),hsl(${130 + hue(nm) % 60} 65% 32%))` });
+  const wrap = h('div', { class: 'avw', style: `width:${size}px;height:${size}px` });
+  const el = h('div', { class: 'av', style: `font-size:${size * .42}px;background:linear-gradient(135deg,hsl(${100 + hue(nm) % 80} 60% 45%),hsl(${130 + hue(nm) % 60} 65% 32%))` });
   if (p && p.avatar_url) el.append(h('img', { src: p.avatar_url, alt: '', loading: 'lazy' }));
   else el.textContent = nm[0].toUpperCase();
-  if (online) el.append(h('i', { class: 'dot' }));
-  return el;
+  wrap.append(el);
+  if (online) wrap.append(h('i', { class: 'dot' }));
+  return wrap;
 }
 const isOnline = (p) => p && Date.now() - new Date(p.last_seen).getTime() < 90000;
 async function resizeImage(file, max = 1600) {
@@ -364,6 +451,10 @@ const S = {
   pending: [],             // отправляемые сейчас
   results: [], q: '',
   channel: null, timers: [],
+  els: new Map(),          // id сообщения -> готовый DOM-элемент (чтобы не перерисовывать)
+  typing: new Map(),       // peerId -> {act, t}
+  sig: new Map(),          // peerId -> канал для отправки сигналов
+  inbox: null, call: null,
 };
 const uid = () => S.me.id;
 const peerOf = (m) => (m.sender === uid() ? m.recipient : m.sender);
@@ -388,7 +479,7 @@ function drawSignupAvatar() {
 }
 $('#tabIn').onclick = () => setAuthMode('in');
 $('#tabUp').onclick = () => { setAuthMode('up'); drawSignupAvatar(); };
-$('#avFile').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) { signupAvatar = await resizeImage(f, 512); drawSignupAvatar(); } };
+$('#avFile').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; const r = await cropAvatar(f); if (r) { signupAvatar = r; drawSignupAvatar(); } };
 $('#avBtn').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#avFile').click(); } };
 $('#dname').oninput = drawSignupAvatar;
 $('#nick').oninput = () => {
@@ -473,7 +564,8 @@ const incoming = () => S.friends.filter((f) => f.status === 'pending' && f.addre
 
 $('#avFileSet').onchange = async (e) => {
   const f = e.target.files[0]; e.target.value = ''; if (!f || !S.me) return;
-  try { S.me.avatar_url = await uploadAvatar(await resizeImage(f, 512), uid()); S.profiles.set(uid(), S.me); toast('Аватарка обновлена'); renderPanel(); }
+  const cropped = await cropAvatar(f); if (!cropped) return;
+  try { S.me.avatar_url = await uploadAvatar(cropped, uid()); S.profiles.set(uid(), S.me); toast('Аватарка обновлена'); renderPanel(); }
   catch (ex) { console.error('avatar', ex); toast('Не удалось загрузить аватарку: ' + (ex.message || ex)); }
 };
 
@@ -499,10 +591,12 @@ async function startApp() {
 }
 function showAuth() { $('#boot').hidden = true; $('#app').hidden = true; $('#auth').hidden = false; setAuthMode(authMode); }
 async function logout() {
+  if (S.call) hangup();
   try { await removePush(); } catch (_) {}
   if (S.channel) sb.removeChannel(S.channel);
+  closeSignals();
   S.timers.forEach(clearInterval); await sb.auth.signOut();
-  S.me = null; S.peer = null; S.pushed = false; S.msgs.clear(); S.friends = []; S.profiles.clear(); S.files.clear(); S.blobs.clear(); S.settings = null; location.hash = ''; showAuth();
+  S.me = null; S.peer = null; S.pushed = false; S.msgs.clear(); S.els.clear(); S.typing.clear(); S.friends = []; S.profiles.clear(); S.files.clear(); S.blobs.clear(); S.settings = null; location.hash = ''; showAuth();
 }
 
 /* ================= realtime ================= */
@@ -512,6 +606,7 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'oilim_messages' }, onMsgEvent)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'oilim_friendships' }, onFriendEvent)
     .subscribe();
+  subscribeInbox();
 }
 async function onMsgEvent(p) {
   if (p.eventType === 'INSERT') {
@@ -529,6 +624,7 @@ async function onMsgEvent(p) {
     const a = S.msgs.get(peerOf(p.new)); const i = a ? a.findIndex((x) => x.id === p.new.id) : -1; if (i >= 0) a[i] = p.new;
   } else if (p.eventType === 'DELETE') {
     for (const a of S.msgs.values()) { const i = a.findIndex((x) => x.id === p.old.id); if (i >= 0) a.splice(i, 1); }
+    S.els.delete(p.old.id);
   }
   renderPanel(true); if (S.peer) renderMsgs(p.eventType === 'INSERT'); updateBadges();
 }
@@ -539,7 +635,7 @@ async function onFriendEvent(p) {
   if (p.eventType === 'UPDATE' && p.new.status === 'accepted' && p.new.requester === uid()) toast(nameOf(S.profiles.get(p.new.addressee)) + ' принял(а) заявку');
   renderPanel(); updateBadges(); if (S.peer && !friendIds().includes(S.peer)) closeChat();
 }
-const preview = (m) => (m.kind === 'text' ? m.body : m.kind === 'image' ? '📷 Фото' : m.kind === 'voice' ? '🎤 Голосовое' : '📎 Файл');
+const preview = (m) => { if (m.kind === 'text') return m.body; if (m.kind === 'image') return '📷 Фото'; if (m.kind === 'voice') return '🎤 Голосовое'; const f = S.files.get(m.file_id); return f && f.mime && f.mime.startsWith('video/') ? '🎬 Видео' : '📎 Файл'; };
 
 /* ================= рендер ================= */
 function renderAll() { renderPanel(); renderMain(); updateBadges(); }
@@ -569,7 +665,8 @@ function renderChats(p) {
     return h('button', { class: 'row' + (S.peer === id ? ' on' : ''), onclick: () => openChat(id) },
       avatar(pr, 50, isOnline(pr)),
       h('div', { class: 'mid' }, h('div', { class: 'nm' }, nameOf(pr)),
-        h('div', { class: 'sub' }, last ? (last.sender === uid() ? 'Вы: ' : '') + preview(last) : '@' + pr?.nick)),
+        S.typing.get(id) ? h('div', { class: 'sub typing' }, S.typing.get(id).act === 'voice' ? 'записывает голосовое' : 'печатает', dotsEl())
+          : h('div', { class: 'sub' }, last ? (last.sender === uid() ? 'Вы: ' : '') + preview(last) : '@' + pr?.nick)),
       h('div', { class: 'meta' }, last ? fmtTime(last.created_at) : '', u ? h('span', { class: 'badge' }, u) : null));
   }));
 }
@@ -679,25 +776,42 @@ $('#themeBtn').onclick = () => { const cur = document.documentElement.getAttribu
 /* ---------- чат ---------- */
 function renderMain() {
   const m = $('#main'); if (recFinish) recFinish(false);
+  if (typingTo && typingTo !== S.peer) { sigSend(typingTo, 'typing', { on: false }); typingTo = null; lastTyping = 0; }
   if (!S.peer) { $('#app').classList.remove('in-chat'); m.replaceChildren(h('div', { class: 'ph' }, h('img', { src: 'icon.svg', alt: '' }), h('div', { class: 'logo', style: 'font-size:22px;color:var(--ink)' }, 'oilim'), h('div', {}, 'Выберите чат слева или найдите друга по нику'))); return; }
   $('#app').classList.add('in-chat');
   const ta = h('textarea', { id: 'ta', rows: 1, placeholder: 'Сообщение', onkeydown: (e) => { if (e.key === 'Enter' && !e.shiftKey && matchMedia('(min-width:821px)').matches) { e.preventDefault(); sendText(); } }, oninput: autoGrow });
-  const fImg = h('input', { type: 'file', accept: 'image/*', multiple: true, hidden: true, onchange: (e) => { [...e.target.files].forEach((f) => sendFile(f, 'image')); e.target.value = ''; } });
+  const fImg = h('input', { type: 'file', accept: 'image/*,video/*', multiple: true, hidden: true, onchange: (e) => { [...e.target.files].forEach((f) => sendFile(f, f.type.startsWith('image/') ? 'image' : 'file')); e.target.value = ''; } });
   const fAny = h('input', { type: 'file', multiple: true, hidden: true, onchange: (e) => { [...e.target.files].forEach((f) => sendFile(f, f.type.startsWith('image/') ? 'image' : 'file')); e.target.value = ''; } });
   const ib = (svg, t, fn) => h('button', { class: 'iconbtn', title: t, 'aria-label': t, onclick: fn, html: svg });
   m.replaceChildren(h('div', { class: 'chead', id: 'chead' }),
     h('div', { class: 'msgs', id: 'msgs' }),
-    h('div', { class: 'composer', id: 'composer' }, ib(SVG.smile, 'Эмодзи', toggleEmoji), ib(SVG.img, 'Фото', () => fImg.click()), ib(SVG.clip, 'Файл', () => fAny.click()), fImg, fAny, ta,
-      h('button', { class: 'send', id: 'sendBtn', title: 'Отправить', 'aria-label': 'Отправить', onclick: () => (ta.value.trim() ? sendText() : startRec()), html: SVG.mic })));
+    h('div', { class: 'composer', id: 'composer' }, ib(SVG.smile, 'Эмодзи', toggleEmoji), ib(SVG.img, 'Фото или видео', () => fImg.click()), ib(SVG.clip, 'Файл', () => fAny.click()), fImg, fAny, ta,
+      h('button', { class: 'send', id: 'sendBtn', title: 'Отправить', 'aria-label': 'Отправить', onclick: () => (ta.value.trim() ? sendText() : startRec()), 'data-mode': 'mic', html: SVG.mic })));
   renderHead(); renderMsgs(true);
   const d = $('#msgs'); d.ondragover = (e) => e.preventDefault(); d.ondrop = (e) => { e.preventDefault(); [...e.dataTransfer.files].forEach((f) => sendFile(f, f.type.startsWith('image/') ? 'image' : 'file')); };
   ta.onpaste = (e) => { const fs = [...(e.clipboardData?.files || [])]; if (fs.length) { e.preventDefault(); fs.forEach((f) => sendFile(f, f.type.startsWith('image/') ? 'image' : 'file')); } };
 }
-function autoGrow() { const t = $('#ta'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 140) + 'px'; $('#sendBtn').innerHTML = t.value.trim() ? SVG.send : SVG.mic; }
+function autoGrow() {
+  const t = $('#ta'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 140) + 'px';
+  const on = !!t.value.trim(); setSendIcon(on); sendTyping(on);
+}
+// иконка меняется только при смене режима (микрофон ↔ отправить), поэтому анимация не повторяется на каждую букву
+function setSendIcon(on) { const b = $('#sendBtn'); if (!b) return; const mode = on ? 'send' : 'mic'; if (b.dataset.mode === mode) return; b.dataset.mode = mode; b.innerHTML = on ? SVG.send : SVG.mic; }
 function renderHead() {
   const pr = S.profiles.get(S.peer); const hd = $('#chead'); if (!hd) return;
+  const ib = (svg, t, fn) => h('button', { class: 'iconbtn', title: t, 'aria-label': t, onclick: fn, html: svg });
   hd.replaceChildren(h('button', { class: 'iconbtn back', onclick: closeChat, 'aria-label': 'Назад', html: SVG.back }), avatar(pr, 42, isOnline(pr)),
-    h('div', { class: 'mid' }, h('div', { class: 'nm' }, nameOf(pr)), h('div', { class: 'st' }, isOnline(pr) ? 'в сети' : '@' + pr.nick + ' · был(а) ' + new Date(pr.last_seen).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))));
+    h('div', { class: 'mid' }, h('div', { class: 'nm' }, nameOf(pr)), h('div', { class: 'st', id: 'hst' })),
+    ib(SVG.phone, 'Позвонить', () => startCall(S.peer, false)), ib(SVG.video, 'Видеозвонок', () => startCall(S.peer, true)));
+  paintStatus(true);
+}
+function paintStatus(force) {
+  const el = $('#hst'), pr = S.profiles.get(S.peer); if (!el || !pr) return;
+  const ty = S.typing.get(S.peer), key = ty ? 't:' + ty.act : isOnline(pr) ? 'on' : 'off:' + pr.last_seen;
+  if (!force && el.dataset.k === key) return; el.dataset.k = key;
+  el.classList.toggle('typing', !!ty);
+  if (ty) el.replaceChildren(ty.act === 'voice' ? 'записывает голосовое' : 'печатает', dotsEl());
+  else el.textContent = isOnline(pr) ? 'в сети' : '@' + pr.nick + ' · был(а) ' + new Date(pr.last_seen).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 function openChat(id) {
   if (!S.peer && !S.pushed) { history.pushState(null, '', '#chat=' + id); S.pushed = true; } else history.replaceState(null, '', '#chat=' + id);
@@ -719,6 +833,7 @@ navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.type =
 function renderMsgs(stick) {
   S.pending.forEach((p) => { if (p.rendered) p.shown = 1; p.rendered = 1; });
   const box = $('#msgs'); if (!box) return;
+  const prevTop = box.scrollTop;
   const near = box.scrollHeight - box.scrollTop - box.clientHeight < 140;
   const list = [...(S.msgs.get(S.peer) || [])].map((m) => ({ m })).concat(S.pending.filter((p) => p.to === S.peer).map((p) => ({ p })));
   if (S.shownFor !== S.peer) { S.shown = new Set(list.filter((x) => x.m).map((x) => x.m.id)); S.shownFor = S.peer; }
@@ -727,26 +842,37 @@ function renderMsgs(stick) {
     const m = it.m || it.p; const dk = dayKey(m.created_at); if (dk !== last) { out.push(h('div', { class: 'day' }, dayLabel(m.created_at))); last = dk; }
     out.push(it.m ? msgEl(it.m) : pendingEl(it.p));
   }
-  if (!out.length) out.push(h('div', { class: 'empty', style: 'margin:auto' }, h('b', {}, 'Напишите первым'), 'Сообщения, фото и голосовые появятся здесь.'));
+  if (!out.length) out.push(h('div', { class: 'empty', style: 'margin:auto' }, h('b', {}, 'Напишите первым'), 'Сообщения, фото, видео и голосовые появятся здесь.'));
   box.replaceChildren(...out);
-  if (stick || near) box.scrollTop = box.scrollHeight;
+  box.scrollTop = stick || near ? box.scrollHeight : prevTop;
 }
-function ticks(m) { return m.sender === uid() ? (m.read_at ? '✓✓' : '✓') : ''; }
+// галочки одного размера: ширина пузыря не зависит от того, прочитано сообщение или нет
+function paintTicks(el, m) {
+  const tk = el.querySelector('.tk'); if (!tk) return;
+  const st = m.read_at ? '2' : '1'; if (tk.dataset.s === st) return;
+  tk.dataset.s = st; tk.className = 'tk' + (st === '2' ? ' r' : '');
+  tk.innerHTML = '<svg viewBox="0 0 18 11" aria-label="' + (st === '2' ? 'Прочитано' : 'Доставлено') + '">' + TICK_A + (st === '2' ? TICK_B : '') + '</svg>';
+}
 function msgEl(m) {
+  const cached = S.els.get(m.id);
+  if (cached) { paintTicks(cached, m); return cached; }
   const me = m.sender === uid(); const f = m.file_id && S.files.get(m.file_id);
   const body = [];
   if (m.kind === 'image' && f) body.push(imageEl(f));
   else if (m.kind === 'voice' && f) body.push(voiceEl(f));
-  else if (m.kind === 'file' && f) body.push(fileEl(f));
+  else if (m.kind === 'file' && f) body.push(f.mime && f.mime.startsWith('video/') ? videoEl(f) : fileEl(f));
   else if ((m.kind !== 'text') && !f) body.push(h('i', {}, 'Вложение недоступно'));
   if (m.kind === 'text') body.push(m.body); else if (m.body) body.push(h('div', { class: 'cap' }, m.body));
   const fresh = !S.shown.has(m.id); S.shown.add(m.id);
-  return h('div', { class: 'm' + (me ? ' me' : '') + (fresh ? ' in' : '') }, body, h('div', { class: 't' }, fmtTime(m.created_at), ticks(m)),
+  const el = h('div', { class: 'm' + (me ? ' me' : '') + (fresh ? ' in' : ''), 'data-id': m.id }, body, h('div', { class: 't' }, fmtTime(m.created_at), me ? h('span', { class: 'tk' }) : null),
     me ? h('button', { class: 'x', title: 'Удалить', 'aria-label': 'Удалить сообщение', onclick: () => delMsg(m), html: '×' }) : null);
+  el.addEventListener('animationend', (e) => { if (e.target === el) el.classList.remove('in'); });
+  paintTicks(el, m); S.els.set(m.id, el); return el;
 }
 async function delMsg(m) {
   const { error } = await sb.from('oilim_messages').delete().eq('id', m.id);
   if (error) return toast('Не удалось удалить');
+  S.els.delete(m.id);
   const a = S.msgs.get(peerOf(m)), ix = a ? a.findIndex((x) => x.id === m.id) : -1; if (ix >= 0) a.splice(ix, 1);
   if (m.file_id) { const f = S.files.get(m.file_id); if (f) { const paths = Array.from({ length: f.chunks }, (_, i) => `${f.owner}/${f.id}/${i}`); sb.storage.from('oilim-files').remove(paths).then(() => sb.from('oilim_files').delete().eq('id', f.id)); } }
   renderMsgs(); renderPanel(true);
@@ -841,8 +967,8 @@ async function startRec() {
   const mr = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined), chunks = []; const t0 = Date.now();
   mr.ondataavailable = (e) => e.data.size && chunks.push(e.data);
   const tm = h('div', { class: 'tm' }, '0:00'); const iv = setInterval(() => (tm.textContent = fmtDur(Date.now() - t0)), 250);
-  const to = S.peer;
-  const finish = (send) => { recFinish = null; clearInterval(iv); bar.remove(); rec = null; mr.onstop = () => { stream.getTracks().forEach((t) => t.stop()); if (!send) return; const dur = Date.now() - t0; if (dur < 600) return toast('Слишком короткое'); const type = mr.mimeType || 'audio/webm'; S.peer === to && sendFile(new File(chunks, `voice-${Date.now()}.${type.includes('mp4') ? 'm4a' : 'webm'}`, { type }), 'voice', { duration_ms: dur }); }; mr.stop(); };
+  const to = S.peer; sendTyping(true, 'voice'); const tvi = setInterval(() => sendTyping(true, 'voice'), 2500);
+  const finish = (send) => { recFinish = null; clearInterval(iv); clearInterval(tvi); sendTyping(false); bar.remove(); rec = null; mr.onstop = () => { stream.getTracks().forEach((t) => t.stop()); if (!send) return; const dur = Date.now() - t0; if (dur < 600) return toast('Слишком короткое'); const type = mr.mimeType || 'audio/webm'; S.peer === to && sendFile(new File(chunks, `voice-${Date.now()}.${type.includes('mp4') ? 'm4a' : 'webm'}`, { type }), 'voice', { duration_ms: dur }); }; mr.stop(); };
   const bar = h('div', { class: 'rec' }, h('i', { class: 'pulse' }), tm, h('button', { class: 'btn ghost sm', onclick: () => finish(false) }, 'Отмена'), h('button', { class: 'send', 'aria-label': 'Отправить голосовое', onclick: () => finish(true), html: SVG.send }));
   $('#composer').append(bar); mr.start(); rec = mr; recFinish = finish;
 }
@@ -853,6 +979,350 @@ function toggleEmoji() {
   const p = h('div', { class: 'emo' }, EMOJI.map((e) => h('button', { onclick: () => { const t = $('#ta'); t.value += e; autoGrow(); t.focus(); } }, e)));
   $('#composer').append(p);
 }
+
+/* ================= иконки для звонков ================= */
+Object.assign(SVG, {
+  phone: '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  video: '<svg viewBox="0 0 24 24"><path d="m23 7-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
+  micoff: '<svg viewBox="0 0 24 24"><path d="m1 1 22 22"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23M12 19v4M8 23h8"/></svg>',
+  camoff: '<svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/><path d="m1 1 22 22"/></svg>',
+  flip: '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>',
+});
+const TICK_A = '<path d="M1 5.8 4.1 9 10.5 1.5"/>', TICK_B = '<path d="M5.5 5.8 8.6 9 15 1.5"/>';
+const dotsEl = () => h('span', { class: 'dots' }, h('i'), h('i'), h('i'));
+
+/* ================= сигналы (Supabase Realtime broadcast) ================= */
+// Для надёжных звонков через мобильный интернет добавьте сюда свой TURN-сервер.
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turns:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' },
+];
+function subscribeInbox() {
+  if (S.inbox) sb.removeChannel(S.inbox);
+  S.inbox = sb.channel('oilim-inbox:' + uid()).on('broadcast', { event: 'sig' }, (m) => onSig(m.payload)).subscribe();
+}
+function sigChannel(peer) {
+  const have = S.sig.get(peer); if (have) return have.ready;
+  const ch = sb.channel('oilim-inbox:' + peer);
+  const ready = new Promise((res) => {
+    ch.subscribe((st) => {
+      if (st === 'SUBSCRIBED') res(ch);
+      else if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') { if (S.sig.get(peer)?.ch === ch) { S.sig.delete(peer); sb.removeChannel(ch); } res(null); }
+    });
+  });
+  S.sig.set(peer, { ch, ready }); return ready;
+}
+async function sigSend(peer, type, data = {}) {
+  try {
+    const ch = await Promise.race([sigChannel(peer), new Promise((r) => setTimeout(() => r(null), 5000))]);
+    if (!ch) return false;
+    await ch.send({ type: 'broadcast', event: 'sig', payload: { type, from: uid(), to: peer, ...data } });
+    return true;
+  } catch (_) { return false; }
+}
+function closeSignals() {
+  if (S.inbox) sb.removeChannel(S.inbox); S.inbox = null;
+  for (const e of S.sig.values()) sb.removeChannel(e.ch);
+  S.sig.clear();
+}
+function onSig(p) {
+  if (!p || !S.me || p.to !== uid() || !friendIds().includes(p.from)) return;
+  if (p.type === 'typing') return onTyping(p);
+  onCallSig(p);
+}
+
+/* ================= «печатает…» ================= */
+let lastTyping = 0, typingTo = null;
+function sendTyping(on, act = 'text') {
+  const to = S.peer; if (!to) return;
+  if (on) { if (typingTo === to && Date.now() - lastTyping < 2500) return; lastTyping = Date.now(); typingTo = to; }
+  else { if (typingTo !== to) return; typingTo = null; lastTyping = 0; }
+  sigSend(to, 'typing', { on, act });
+}
+function onTyping(p) {
+  const old = S.typing.get(p.from); if (old) clearTimeout(old.t);
+  if (p.on) S.typing.set(p.from, { act: p.act || 'text', t: setTimeout(() => { S.typing.delete(p.from); typingChanged(p.from); }, 4500) });
+  else S.typing.delete(p.from);
+  typingChanged(p.from);
+}
+function typingChanged(id) { renderPanel(true); if (S.peer === id) paintStatus(); }
+
+/* ================= звонки (WebRTC) ================= */
+const newCall = (o) => Object.assign({ pc: null, local: null, remote: null, cands: [], mic: true, cam: false, rMic: true, rCam: o.video, facing: 'user', t0: 0, multi: false }, o);
+async function getMedia(video) {
+  const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+  if (!video) return { stream: await navigator.mediaDevices.getUserMedia({ audio }), video: false };
+  try { return { stream: await navigator.mediaDevices.getUserMedia({ audio, video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } }), video: true }; }
+  catch (_) { const stream = await navigator.mediaDevices.getUserMedia({ audio }); toast('Камера недоступна — звонок только со звуком'); return { stream, video: false }; }
+}
+const mediaErr = (e) => (e && e.name === 'NotAllowedError' ? 'Разрешите доступ к микрофону' : e && e.name === 'NotFoundError' ? 'Микрофон не найден' : 'Не удалось включить микрофон');
+const hasManyCams = async () => { try { return (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'videoinput').length > 1; } catch (_) { return false; } };
+async function wakeLock(c) { try { const l = await navigator.wakeLock?.request('screen'); if (S.call !== c) l && l.release(); else c.wl = l; } catch (_) {} }
+
+let ringIv = null;
+function stopRing() { clearInterval(ringIv); ringIv = null; try { navigator.vibrate && navigator.vibrate(0); } catch (_) {} }
+function startRing(kind) {
+  stopRing();
+  const once = () => {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
+      if (kind === 'in') { tone(880, 0, .18, 'sine', .2); tone(660, .2, .18, 'sine', .2); tone(880, .6, .18, 'sine', .2); tone(660, .8, .18, 'sine', .2); navigator.vibrate && navigator.vibrate([300, 150, 300]); }
+      else tone(425, 0, .9, 'sine', .12);
+    } catch (_) {}
+  };
+  once(); ringIv = setInterval(once, kind === 'in' ? 2200 : 3000);
+}
+
+function callStatus(c) {
+  if (c.state === 'calling') return c.acked ? 'Звонок…' : 'Вызов…';
+  if (c.state === 'ringing') return c.video ? 'Входящий видеозвонок' : 'Входящий звонок';
+  if (c.state === 'connecting') return 'Соединение…';
+  if (c.weak) return 'Связь нестабильна…';
+  return fmtDur(Date.now() - c.t0) + (c.rMic === false ? ' · микрофон выключен' : '');
+}
+function paintCall() {
+  const el = $('#call'), c = S.call;
+  if (!c) { el.hidden = true; $('#cCtl').replaceChildren(); $('#cMid').dataset.id = ''; return; }
+  el.hidden = false;
+  const pr = S.profiles.get(c.peer);
+  $('#cName').textContent = nameOf(pr); $('#cSt').textContent = callStatus(c);
+  const mid = $('#cMid'); if (mid.dataset.id !== c.id) { mid.dataset.id = c.id; mid.replaceChildren(avatar(pr, 132)); }
+  const hasRV = !!(c.remote && c.remote.getVideoTracks().length);
+  const showRV = c.video && c.rCam !== false && hasRV && (c.state === 'connected' || c.state === 'connecting');
+  $('#rv').classList.toggle('novid', !showRV); mid.hidden = showRV;
+  mid.classList.toggle('ringing', c.state === 'calling' || c.state === 'ringing');
+  const hasLV = !!(c.local && c.local.getVideoTracks().length);
+  $('#cPip').hidden = !(hasLV && c.state !== 'ringing'); $('#cPipOff').hidden = c.cam; $('#lv').classList.toggle('mir', c.facing === 'user');
+  const b = (svg, label, cls, fn) => h('button', { class: 'cb ' + cls, title: label, 'aria-label': label, onclick: fn, html: svg });
+  const ctl = [];
+  if (c.dir === 'in' && c.state === 'ringing') ctl.push(b(SVG.phone, 'Отклонить', 'red', declineCall), b(c.video ? SVG.video : SVG.phone, 'Принять', 'green', acceptCall));
+  else {
+    ctl.push(b(c.mic ? SVG.mic : SVG.micoff, c.mic ? 'Выключить микрофон' : 'Включить микрофон', c.mic ? '' : 'off', toggleMic));
+    if (hasLV) { ctl.push(b(c.cam ? SVG.video : SVG.camoff, c.cam ? 'Выключить камеру' : 'Включить камеру', c.cam ? '' : 'off', toggleCam)); if (c.multi) ctl.push(b(SVG.flip, 'Сменить камеру', '', flipCam)); }
+    ctl.push(b(SVG.phone, 'Завершить', 'red', hangup));
+  }
+  $('#cCtl').replaceChildren(...ctl);
+}
+const sendMedia = (c) => sigSend(c.peer, 'media', { id: c.id, mic: c.mic, cam: c.cam });
+function toggleMic() { const c = S.call; if (!c || !c.local) return; c.mic = !c.mic; c.local.getAudioTracks().forEach((t) => (t.enabled = c.mic)); sendMedia(c); paintCall(); }
+function toggleCam() { const c = S.call; if (!c || !c.local) return; c.cam = !c.cam; c.local.getVideoTracks().forEach((t) => (t.enabled = c.cam)); sendMedia(c); paintCall(); }
+async function flipCam() {
+  const c = S.call; const old = c && c.local && c.local.getVideoTracks()[0]; if (!old) return;
+  const next = c.facing === 'user' ? 'environment' : 'user';
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: next }, width: { ideal: 1280 }, height: { ideal: 720 } } });
+    const nt = s.getVideoTracks()[0]; nt.enabled = c.cam;
+    const sender = c.pc && c.pc.getSenders().find((x) => x.track && x.track.kind === 'video'); if (sender) await sender.replaceTrack(nt);
+    old.stop(); c.local.removeTrack(old); c.local.addTrack(nt); c.facing = next; $('#lv').srcObject = c.local; paintCall();
+  } catch (_) { toast('Не удалось переключить камеру'); }
+}
+
+function makePC(c) {
+  const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  c.pc = pc; c.remote = new MediaStream();
+  pc.onicecandidate = (e) => { if (e.candidate) sigSend(c.peer, 'ice', { id: c.id, cand: e.candidate.toJSON() }); };
+  pc.ontrack = (e) => { c.remote.addTrack(e.track); const rv = $('#rv'); rv.srcObject = c.remote; rv.play().catch(() => {}); paintCall(); };
+  pc.onconnectionstatechange = () => {
+    if (S.call !== c) return; const s = pc.connectionState;
+    if (s === 'connected') {
+      clearTimeout(c.dropT); c.weak = false;
+      if (c.state !== 'connected') { c.state = 'connected'; c.t0 = Date.now(); stopRing(); c.tick = setInterval(() => { if (S.call === c) $('#cSt').textContent = callStatus(c); }, 1000); }
+      paintCall();
+    } else if (s === 'disconnected') {
+      c.weak = true; paintCall(); clearTimeout(c.dropT);
+      c.dropT = setTimeout(() => { if (S.call === c && pc.connectionState !== 'connected') finishCall('lost'); }, 10000);
+    } else if (s === 'failed') finishCall('failed');
+  };
+  c.local.getTracks().forEach((t) => pc.addTrack(t, c.local));
+  $('#lv').srcObject = c.local;
+}
+async function addRemoteIce(c, cand) { if (c.pc && c.pc.remoteDescription) { try { await c.pc.addIceCandidate(cand); } catch (_) {} } else c.cands.push(cand); }
+async function flushIce(c) { for (const x of c.cands.splice(0)) { try { await c.pc.addIceCandidate(x); } catch (_) {} } }
+
+async function startCall(peer, video) {
+  if (S.call) return toast('Сначала завершите текущий звонок');
+  if (!window.RTCPeerConnection || !navigator.mediaDevices?.getUserMedia) return toast('Звонки не поддерживаются в этом браузере');
+  if (!window.isSecureContext) return toast('Для звонков нужен адрес https://…');
+  const c = S.call = newCall({ id: crypto.randomUUID(), peer, video: !!video, dir: 'out', state: 'calling' });
+  paintCall();
+  try {
+    const r = await getMedia(video);
+    if (S.call !== c) { r.stream.getTracks().forEach((t) => t.stop()); return; }
+    c.local = r.stream; c.cam = r.video;
+  } catch (e) { toast(mediaErr(e)); c.noLog = true; return finishCall('nomedia'); }
+  c.multi = await hasManyCams(); if (S.call !== c) return;
+  makePC(c); paintCall();
+  const inv = () => sigSend(peer, 'invite', { id: c.id, video: !!video });
+  inv(); startRing('out');
+  c.inviteT = setInterval(() => { if (S.call === c && c.state === 'calling' && !c.acked) inv(); }, 2500);
+  c.noAnsT = setTimeout(() => { if (S.call === c && c.state === 'calling') { sigSend(peer, 'cancel', { id: c.id }); finishCall('noanswer'); } }, 45000);
+  wakeLock(c);
+}
+const doneCalls = new Set();
+function onInvite(p) {
+  const c = S.call;
+  if (doneCalls.has(p.id) || (c && c.id === p.id)) return;
+  if (c) {
+    if (c.peer === p.from && c.dir === 'out' && c.state === 'calling') {
+      if (uid() < p.from) return;                       // встречные вызовы: «главный» тот, у кого id меньше
+      c.noLog = true; finishCall('merge'); return beginIncoming(p, true);
+    }
+    return void sigSend(p.from, 'busy', { id: p.id });
+  }
+  beginIncoming(p, false);
+}
+function beginIncoming(p, auto) {
+  const c = S.call = newCall({ id: p.id, peer: p.from, video: !!p.video, dir: 'in', state: 'ringing' });
+  sigSend(p.from, 'ringing', { id: p.id });
+  paintCall();
+  if (auto) return acceptCall();
+  startRing('in'); callNotify(c);
+  c.timeout = setTimeout(() => { if (S.call === c && c.state === 'ringing') finishCall('missed'); }, 55000);
+}
+async function callNotify(c) {
+  if (document.visibilityState === 'visible' || !pushGranted()) return;
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    reg && reg.showNotification(nameOf(S.profiles.get(c.peer)), { body: c.video ? '📹 Входящий видеозвонок' : '📞 Входящий звонок', icon: 'icon-192.png', badge: 'icon-192.png', tag: 'oilim-call', renotify: true, requireInteraction: true, data: { from: c.peer } });
+  } catch (_) {}
+}
+async function acceptCall() {
+  const c = S.call; if (!c || c.dir !== 'in' || c.state !== 'ringing') return;
+  stopRing(); clearTimeout(c.timeout); c.state = 'connecting'; paintCall();
+  try { const r = await getMedia(c.video); if (S.call !== c) { r.stream.getTracks().forEach((t) => t.stop()); return; } c.local = r.stream; c.cam = r.video; }
+  catch (e) { toast(mediaErr(e)); sigSend(c.peer, 'decline', { id: c.id }); c.noLog = true; return finishCall('nomedia'); }
+  c.multi = await hasManyCams(); if (S.call !== c) return;
+  makePC(c); paintCall(); wakeLock(c);
+  await sigSend(c.peer, 'accept', { id: c.id });
+  if (c.pendingOffer) { const o = c.pendingOffer; c.pendingOffer = null; handleOffer(c, o); }
+}
+function declineCall() { const c = S.call; if (!c) return; sigSend(c.peer, 'decline', { id: c.id }); finishCall('declined-local'); }
+function hangup() {
+  const c = S.call; if (!c) return;
+  if (c.dir === 'in' && c.state === 'ringing') return declineCall();
+  const early = c.dir === 'out' && c.state === 'calling';
+  sigSend(c.peer, early ? 'cancel' : 'end', { id: c.id }); finishCall(early ? 'cancelled' : 'ended');
+}
+async function handleOffer(c, sdp) {
+  if (!c.pc) { c.pendingOffer = sdp; return; }
+  try {
+    await c.pc.setRemoteDescription(sdp); await flushIce(c);
+    const ans = await c.pc.createAnswer(); await c.pc.setLocalDescription(ans);
+    sigSend(c.peer, 'answer', { id: c.id, sdp: { type: ans.type, sdp: ans.sdp } }); sendMedia(c);
+  } catch (_) { if (S.call === c) finishCall('failed'); }
+}
+async function sendOffer(c) {
+  try {
+    const o = await c.pc.createOffer(); await c.pc.setLocalDescription(o);
+    sigSend(c.peer, 'offer', { id: c.id, sdp: { type: o.type, sdp: o.sdp } });
+  } catch (_) { if (S.call === c) finishCall('failed'); }
+}
+async function onCallSig(p) {
+  if (p.type === 'invite') return onInvite(p);
+  const c = S.call; if (!c || c.id !== p.id || c.peer !== p.from) return;
+  switch (p.type) {
+    case 'ringing': if (c.dir === 'out' && c.state === 'calling') { c.acked = true; paintCall(); } break;
+    case 'accept': if (c.dir === 'out' && c.state === 'calling') { clearInterval(c.inviteT); clearTimeout(c.noAnsT); c.state = 'connecting'; stopRing(); paintCall(); await sendOffer(c); } break;
+    case 'offer': if (c.dir === 'in') await handleOffer(c, p.sdp); break;
+    case 'answer': if (c.dir === 'out' && c.pc) { try { await c.pc.setRemoteDescription(p.sdp); await flushIce(c); sendMedia(c); } catch (_) { finishCall('failed'); } } break;
+    case 'ice': await addRemoteIce(c, p.cand); break;
+    case 'media': c.rMic = p.mic; c.rCam = p.cam; paintCall(); break;
+    case 'decline': if (c.dir === 'out') finishCall('declined'); break;
+    case 'busy': if (c.dir === 'out') finishCall('busy'); break;
+    case 'cancel': case 'end': finishCall('remote'); break;
+  }
+}
+function logCall(c, reason, dur) {
+  const ic = c.video ? '📹' : '📞', nm = c.video ? 'Видеозвонок' : 'Звонок';
+  const body = dur ? `${ic} ${nm} · ${fmtDur(dur)}` : reason === 'declined' ? `${ic} ${nm} отклонён` : reason === 'busy' ? `${ic} ${nm}: занято` : `${ic} Пропущенный ${c.video ? 'видеозвонок' : 'звонок'}`;
+  insertMessage({ recipient: c.peer, kind: 'text', body });
+}
+function finishCall(reason) {
+  const c = S.call; if (!c) return; S.call = null; doneCalls.add(c.id);
+  stopRing(); [c.inviteT, c.tick].forEach(clearInterval); [c.noAnsT, c.timeout, c.dropT].forEach(clearTimeout);
+  const dur = c.t0 ? Date.now() - c.t0 : 0;
+  try { c.local && c.local.getTracks().forEach((t) => t.stop()); } catch (_) {}
+  try { c.pc && c.pc.close(); } catch (_) {}
+  try { c.wl && c.wl.release(); } catch (_) {}
+  $('#rv').srcObject = null; $('#lv').srcObject = null; paintCall();
+  navigator.serviceWorker?.getRegistration().then((r) => r && r.getNotifications({ tag: 'oilim-call' }).then((l) => l.forEach((n) => n.close()))).catch(() => {});
+  const nm = nameOf(S.profiles.get(c.peer));
+  const msg = { declined: nm + ' отклонил(а) звонок', busy: nm + ' сейчас разговаривает', noanswer: nm + ' не отвечает', failed: 'Не удалось соединиться', lost: 'Связь прервалась' }[reason];
+  if (msg) toast(msg);
+  if (dur) playSound('drop');
+  if (c.dir === 'out' && !c.noLog) logCall(c, reason, dur);
+}
+$('#call').addEventListener('pointerdown', () => { const rv = $('#rv'); if (rv.srcObject && rv.paused) rv.play().catch(() => {}); });
+$('#cPipOff').innerHTML = SVG.camoff;
+addEventListener('pagehide', () => { if (S.call) hangup(); });
+
+/* ================= видео в чате ================= */
+function videoEl(f) {
+  const box = h('div', { class: 'vid' });
+  const failCard = (u) => h('div', { class: 'file' }, h('a', { class: 'ic', href: u, download: f.name, 'aria-label': 'Скачать', html: FILE_IC }), h('div', { class: 'fi' }, h('div', { class: 'fn' }, f.name), h('div', { class: 'fs' }, 'Не воспроизводится здесь — нажмите, чтобы скачать')));
+  const mount = (u, play) => {
+    const v = h('video', { controls: true, playsinline: true, preload: 'metadata', src: play ? u : u + '#t=0.1' });
+    v.addEventListener('error', () => box.replaceChildren(failCard(u)), { once: true });
+    box.replaceChildren(v); if (play) v.play().catch(() => {});
+  };
+  const bar = h('i'), prog = h('div', { class: 'prog', hidden: true }, bar), fs = h('div', { class: 'fs' }, fmtSize(f.size) + (f.chunks > 1 ? ` · ${f.chunks} частей` : ''));
+  const go = async () => {
+    prog.hidden = false; fs.textContent = 'Загрузка…';
+    try { const u = await assemble(f, (p) => { bar.style.width = p * 100 + '%'; fs.textContent = `Загрузка ${Math.round(p * 100)}%`; }); mount(u, true); }
+    catch (_) { fs.textContent = 'Ошибка загрузки, нажмите ещё раз'; prog.hidden = true; }
+  };
+  box.append(h('button', { class: 'vcard', onclick: go }, h('span', { class: 'vplay', html: PLAY }), h('span', { class: 'vm' }, h('b', {}, f.name), fs, prog)));
+  if (S.blobs.has(f.id)) assemble(f).then((u) => mount(u, false)).catch(() => {});
+  return box;
+}
+
+/* ================= выбор положения аватарки ================= */
+function cropAvatar(file) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    const fallback = () => { URL.revokeObjectURL(url); resizeImage(file, 512).then(resolve); };
+    img.onerror = fallback;
+    img.onload = () => {
+      const w = img.naturalWidth, ht = img.naturalHeight; if (!w || !ht) return fallback();
+      const wrap = $('#crop'), stage = $('#cropStage'), zoom = $('#cropZoom');
+      stage.querySelector('.crop-img')?.remove();
+      img.className = 'crop-img'; img.draggable = false; img.style.width = w + 'px'; img.style.height = ht + 'px';
+      stage.prepend(img); wrap.hidden = false;
+      const D = () => stage.clientWidth;
+      let min = Math.max(D() / w, D() / ht), z = 1, tx = 0, ty = 0;
+      const apply = () => {
+        const d = D(), s = min * z, mx = Math.max(0, (w * s - d) / 2), my = Math.max(0, (ht * s - d) / 2);
+        tx = Math.min(mx, Math.max(-mx, tx)); ty = Math.min(my, Math.max(-my, ty));
+        img.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${s})`;
+      };
+      const zoomTo = (nz) => { nz = Math.min(4, Math.max(1, nz)); const k = nz / z; tx *= k; ty *= k; z = nz; zoom.value = z; apply(); };
+      zoom.min = 1; zoom.max = 4; zoom.step = .01; zoom.value = 1; apply();
+      const ptrs = new Map(); let pd = 0; const dist = () => { const a = [...ptrs.values()]; return a.length === 2 ? Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]) : 0; };
+      stage.onpointerdown = (e) => { try { stage.setPointerCapture(e.pointerId); } catch (_) {} ptrs.set(e.pointerId, [e.clientX, e.clientY]); pd = dist(); };
+      stage.onpointermove = (e) => {
+        if (!ptrs.has(e.pointerId)) return; const prev = ptrs.get(e.pointerId), cur = [e.clientX, e.clientY];
+        if (ptrs.size === 1) { tx += cur[0] - prev[0]; ty += cur[1] - prev[1]; apply(); }
+        ptrs.set(e.pointerId, cur);
+        if (ptrs.size === 2) { const d = dist(); if (pd) zoomTo(z * d / pd); pd = d; }
+      };
+      stage.onpointerup = stage.onpointercancel = (e) => { ptrs.delete(e.pointerId); pd = dist(); };
+      stage.onwheel = (e) => { e.preventDefault(); zoomTo(z * (e.deltaY < 0 ? 1.08 : 1 / 1.08)); };
+      zoom.oninput = () => zoomTo(+zoom.value);
+      const close = (res) => { wrap.hidden = true; stage.onpointerdown = stage.onpointermove = stage.onpointerup = stage.onpointercancel = stage.onwheel = null; img.remove(); URL.revokeObjectURL(url); resolve(res); };
+      $('#cropNo').onclick = () => close(null);
+      $('#cropOk').onclick = async () => {
+        const d = D(), k = 512 / d, s = min * z, c = document.createElement('canvas'); c.width = c.height = 512;
+        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 512, 512); g.imageSmoothingQuality = 'high';
+        g.drawImage(img, (d / 2 + tx - w * s / 2) * k, (d / 2 + ty - ht * s / 2) * k, w * s * k, ht * s * k);
+        const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', .9));
+        close(blob ? new File([blob], 'avatar.jpg', { type: 'image/jpeg' }) : null);
+      };
+    };
+    img.src = url;
+  });
+}
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#crop').hidden) $('#cropNo').click(); });
 
 /* ================= push ================= */
 const b64 = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };

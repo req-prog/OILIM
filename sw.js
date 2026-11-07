@@ -1,4 +1,4 @@
-const CACHE = 'oilim-shell-v2';
+const CACHE = 'oilim-shell-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
